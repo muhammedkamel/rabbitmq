@@ -4,6 +4,8 @@ namespace Almatar\RabbitMQ\Adapters;
 
 use Almatar\RabbitMQ\Connector;
 use Illuminate\Support\Facades\Log;
+use PhpAmqpLib\Message\AMQPMessage;
+use PhpAmqpLib\Wire\AMQPTable;
 
 /**
  * Class BaseAmqp

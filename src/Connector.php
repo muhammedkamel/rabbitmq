@@ -4,7 +4,6 @@ namespace Almatar\RabbitMQ;
 
 use Illuminate\Support\Facades\Log;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Exception\AMQPProtocolConnectionException;
 
 /**
  * Class Connector
@@ -13,11 +12,55 @@ use PhpAmqpLib\Exception\AMQPProtocolConnectionException;
  */
 class Connector
 {
-
     /**
      * @var AMQPStreamConnection
      */
-    protected $connection;
+    private $connection = null;
+
+    /**
+     * @var array
+     */
+    private $parameters = array(
+        'host' => 'localhost',
+        'port' => 5672,
+        'user' => 'guest',
+        'password' => 'guest',
+        'vhost' => '/',
+        'connection_timeout' => 3,
+        'read_write_timeout' => 3,
+        'ssl_context' => null,
+        'keepalive' => false,
+        'heartbeat' => 0,
+    );
+
+    /**
+     * @var int
+     */
+    private $connectionAttemps = 0;
+
+    /**
+     * @var int
+     */
+    private $reconnectWaitingSecs = 0;
+
+    /**
+     * Connector constructor.
+     * @param array $parameters
+     */
+    public function __construct(array $parameters)
+    {
+        if (isset($parameters['connection_attempts'])) {
+            $this->connectionAttemps = (int)$parameters['connection_attempts'];
+            unset($parameters['connection_attempts']);
+        }
+
+        if (isset($parameters['reconnect_waiting_seconds'])) {
+            $this->reconnectWaitingSecs = (int)$parameters['reconnect_waiting_seconds'];
+            unset($parameters['reconnect_waiting_seconds']);
+        }
+
+        $this->parameters = array_merge($this->parameters, $parameters);
+    }
 
     /**
      * get AMQP connection
@@ -27,43 +70,38 @@ class Connector
      */
     public function getConnection()
     {
-        $connection = null;
         $connectionAttempts = 0;
 
         while (true) {
             try {
                 $connectionAttempts++;
-                $connection = new AMQPStreamConnection(
-                    config('rabbitmq.connections.default.host'),
-                    config('rabbitmq.connections.default.port'),
-                    config('rabbitmq.connections.default.username'),
-                    config('rabbitmq.connections.default.password'),
-                    config('rabbitmq.connections.default.vhost'),
+                $this->connection = new AMQPStreamConnection(
+                    $this->parameters['host'],
+                    $this->parameters['port'],
+                    $this->parameters['user'],
+                    $this->parameters['password'],
+                    $this->parameters['vhost'],
                     false,
                     'AMQPLAIN',
                     null,
                     'en_US',
-                    3.0,
-                    config('rabbitmq.connections.default.read_write_timeout'),
-                    null,
-                    false,
-                    config('rabbitmq.connections.default.heartbeat')
+                    $this->parameters['connection_timeout'],
+                    $this->parameters['read_write_timeout'],
+                    $this->parameters['ssl_context'],
+                    $this->parameters['keepalive'],
+                    $this->parameters['heartbeat']
                 );
 
-                return $connection;
-            } catch (AMQPProtocolConnectionException $e) { // authentication exception so there is no need to retry
-                Log::warning($e->getMessage());
-
-                throw $e;
+                return $this->connection;
             } catch (\Exception $e) {
-                if ($connectionAttempts < config('rabbitmq.connections.default.connection_attempts')) {
+                if ($connectionAttempts < $this->connectionAttemps) {
                     Log::warning($e->getMessage());
 
-                    if ($connection !== null) {
-                        $connection->close();
+                    if ($this->connection !== null) {
+                        $this->connection->close();
                     }
 
-                    sleep(config('rabbitmq.connections.default.reconnect_waiting_seconds'));
+                    sleep($this->reconnectWaitingSecs);
                     continue;
                 } else {
                     throw $e;
