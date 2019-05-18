@@ -33,6 +33,7 @@ class Producer extends BaseAmqp
             $msg->set('application_headers', $headersTable);
         }
 
-        $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], (string)$this->queueOptions['routing_key']);
+        $this->getChannel()
+            ->basic_publish($msg, $this->exchangeOptions['name'], (string)$this->queueOptions['routing_key']);
     }
 }

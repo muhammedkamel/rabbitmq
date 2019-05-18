@@ -2,7 +2,6 @@
 
 namespace Almatar\RabbitMQ\Adapters;
 
-
 use Almatar\RabbitMQ\Connector;
 use Illuminate\Support\Facades\Log;
 
@@ -186,7 +185,11 @@ class BaseAmqp
             $this->queueOptions['ticket']
         );
 
-        $this->queueBind($this->queueOptions['name'], $this->exchangeOptions['name'], $this->queueOptions['routing_key']);
+        $this->queueBind(
+            $this->queueOptions['name'],
+            $this->exchangeOptions['name'],
+            $this->queueOptions['routing_key']
+        );
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace Almatar\RabbitMQ\Adapters;
 
-
 use Illuminate\Support\Facades\Log;
 
 /**
