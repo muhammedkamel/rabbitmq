@@ -1,0 +1,25 @@
+{
+  "name": "almatar/rabbitmq",
+  "type": "package",
+  "description": "Integrates php-amqplib with Laravel & RabbitMQ.",
+  "keywords": [
+    "laravel",
+    "lumen",
+    "rabbitmq",
+    "exchange",
+    "queue",
+    "message broker",
+    "amqp"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Mohamed Kamel"
+    }
+  ],
+  "require": {
+    "php": "^7.0",
+    "laravel/lumen-framework": "5.7.*",
+    "php-amqplib/php-amqplib": "^2.7"
+  }
+}
