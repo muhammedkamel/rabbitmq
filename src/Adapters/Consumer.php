@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 /**
  * Class Consumer
  * @package Almatar\RabbitMQ\Adapters
- * @author Mohamed Kamel <mohamed.kamel@almtar.com>
+ * @author Mohamed Kamel <muhamed.kamel.elsayed@gmail.com>
  */
 class Consumer extends BaseAmqp
 {

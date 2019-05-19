@@ -10,7 +10,7 @@ use PhpAmqpLib\Wire\AMQPTable;
 /**
  * Class BaseAmqp
  * @package Almatar\RabbitMQ\Adapters
- * @author Mohamed Kamel <mohamed.kamel@almtar.com>
+ * @author Mohamed Kamel <muhamed.kamel.elsayed@gmail.com>
  */
 class BaseAmqp
 {

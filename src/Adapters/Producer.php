@@ -8,7 +8,7 @@ use PhpAmqpLib\Wire\AMQPTable;
 /**
  * Class Producer
  * @package Almatar\RabbitMQ\Adapters
- * @author Mohamed Kamel <mohamed.kamel@almtar.com>
+ * @author Mohamed Kamel <muhamed.kamel.elsayed@gmail.com>
  */
 class Producer extends BaseAmqp
 {

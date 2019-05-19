@@ -7,7 +7,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 /**
  * Class Helper
  * @package Almatar\RabbitMQ
- * @author Mohamed Kamel <mohamed.kamel@almtar.com>
+ * @author Mohamed Kamel <muhamed.kamel.elsayed@gmail.com>
  */
 class Helper
 {
