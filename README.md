@@ -150,6 +150,7 @@ class TestCommand extends Command
 namespace App\Services;
 
 use Almatar\RabbitMQ\Adapters\Producer;
+use PhpAmqpLib\Message\AMQPMessage;
 
 class TestService
 {
@@ -167,12 +168,17 @@ class TestService
         $this->producer = $producer;
     }
 
-    public function execute()
+    /**
+     * @param AMQPMessage $message
+     * @throws Exception
+     */
+    public function execute(AMQPMessage $message)
     {
         $this->producer->publish(
             config('rabbitmq.producers.test_producer'), 
-            'Testing rabbitmq producer'
+            $message->getBody()
         );
+        $message->delivery_info['channel']->basic_ack($message->delivery_info['delivery_tag'], false);
     }
 }
 
