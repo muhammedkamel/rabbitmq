@@ -24,7 +24,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Almatar\\RabbitMQ": "src"
+      "Almatar\\RabbitMQ\\": "src"
     }
   },
   "require-dev": {
