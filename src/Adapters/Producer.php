@@ -6,19 +6,17 @@ use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 
 /**
- * Class Producer
- * @package Almatar\RabbitMQ\Adapters
+ * Class Producer.
+ *
  * @author Mohamed Kamel <muhamed.kamel.elsayed@gmail.com>
  */
 class Producer extends BaseAmqp
 {
-
     /**
-     *
-     * @param array $config
+     * @param array  $config
      * @param string $msgBody
-     * @param array $additionalProperties
-     * @param array $headers
+     * @param array  $additionalProperties
+     * @param array  $headers
      */
     public function publish(array $config, string $msgBody, array $additionalProperties = [], array $headers = [])
     {
@@ -26,7 +24,7 @@ class Producer extends BaseAmqp
 
         $this->queueDeclare($config['queue_options']);
 
-        $msg = new AMQPMessage((string)$msgBody, array_merge($this->getBasicProperties(), $additionalProperties));
+        $msg = new AMQPMessage((string) $msgBody, array_merge($this->getBasicProperties(), $additionalProperties));
 
         if (!empty($headers)) {
             $headersTable = new AMQPTable($headers);
@@ -34,6 +32,6 @@ class Producer extends BaseAmqp
         }
 
         $this->getChannel()
-            ->basic_publish($msg, $this->exchangeOptions['name'], (string)$this->queueOptions['routing_key']);
+            ->basic_publish($msg, $this->exchangeOptions['name'], (string) $this->queueOptions['routing_key']);
     }
 }

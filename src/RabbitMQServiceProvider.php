@@ -5,8 +5,8 @@ namespace Almatar\RabbitMQ;
 use Illuminate\Support\ServiceProvider;
 
 /**
- * Class RabbitMQServiceProvider
- * @package Almatar\RabbitMQ
+ * Class RabbitMQServiceProvider.
+ *
  * @author Mohamed Kamel <muhamed.kamel.elsayed@gmail.com>
  */
 class RabbitMQServiceProvider extends ServiceProvider

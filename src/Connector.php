@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Log;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 /**
- * Class Connector
- * @package Almatar\RabbitMQ
+ * Class Connector.
+ *
  * @author elhassan.mohamed
  */
 class Connector
@@ -20,18 +20,18 @@ class Connector
     /**
      * @var array
      */
-    private $parameters = array(
-        'host' => 'localhost',
-        'port' => 5672,
-        'user' => 'guest',
-        'password' => 'guest',
-        'vhost' => '/',
+    private $parameters = [
+        'host'               => 'localhost',
+        'port'               => 5672,
+        'user'               => 'guest',
+        'password'           => 'guest',
+        'vhost'              => '/',
         'connection_timeout' => 3,
         'read_write_timeout' => 3,
-        'ssl_context' => null,
-        'keepalive' => false,
-        'heartbeat' => 0,
-    );
+        'ssl_context'        => null,
+        'keepalive'          => false,
+        'heartbeat'          => 0,
+    ];
 
     /**
      * @var int
@@ -45,17 +45,18 @@ class Connector
 
     /**
      * Connector constructor.
+     *
      * @param array $parameters
      */
     public function __construct(array $parameters)
     {
         if (isset($parameters['connection_attempts'])) {
-            $this->connectionAttemps = (int)$parameters['connection_attempts'];
+            $this->connectionAttemps = (int) $parameters['connection_attempts'];
             unset($parameters['connection_attempts']);
         }
 
         if (isset($parameters['reconnect_waiting_seconds'])) {
-            $this->reconnectWaitingSecs = (int)$parameters['reconnect_waiting_seconds'];
+            $this->reconnectWaitingSecs = (int) $parameters['reconnect_waiting_seconds'];
             unset($parameters['reconnect_waiting_seconds']);
         }
 
@@ -63,10 +64,11 @@ class Connector
     }
 
     /**
-     * get AMQP connection
+     * get AMQP connection.
+     *
+     * @throws \Exception
      *
      * @return AMQPStreamConnection
-     * @throws \Exception
      */
     public function getConnection()
     {
