@@ -8,15 +8,13 @@ use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 
 /**
- * Class BaseAmqp
- * @package Almatar\RabbitMQ\Adapters
+ * Class BaseAmqp.
+ *
  * @author Mohamed Kamel <muhamed.kamel.elsayed@gmail.com>
  */
 class BaseAmqp
 {
-
     /**
-     *
      * @var Connector
      */
     private $connector;
@@ -27,55 +25,53 @@ class BaseAmqp
     protected $connection;
 
     /**
-     *
      * @var \PhpAmqpLib\Channel\AMQPChannel
      */
     protected $channel;
 
     /**
-     *
      * @var array
      */
     protected $basicProperties = [
         'content_encoding' => 'UTF-8',
-        'content_type' => 'application/json',
-        'delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT
+        'content_type'     => 'application/json',
+        'delivery_mode'    => AMQPMessage::DELIVERY_MODE_PERSISTENT,
     ];
 
     /**
-     *
      * @var array
      */
     protected $exchangeOptions = [
-        'passive' => false,
-        'durable' => true,
+        'passive'     => false,
+        'durable'     => true,
         'auto_delete' => false,
-        'internal' => false,
-        'nowait' => false,
-        'arguments' => null,
-        'ticket' => null,
-        'declare' => true,
+        'internal'    => false,
+        'nowait'      => false,
+        'arguments'   => null,
+        'ticket'      => null,
+        'declare'     => true,
     ];
 
     /**
-     *
      * @var array
      */
     protected $queueOptions = [
-        'name' => '',
-        'passive' => false,
-        'durable' => true,
-        'exclusive' => false,
+        'name'        => '',
+        'passive'     => false,
+        'durable'     => true,
+        'exclusive'   => false,
         'auto_delete' => false,
-        'nowait' => false,
-        'arguments' => null,
-        'ticket' => null,
-        'declare' => true,
+        'nowait'      => false,
+        'arguments'   => null,
+        'ticket'      => null,
+        'declare'     => true,
     ];
 
     /**
      * BaseAmqp constructor.
+     *
      * @param Connector $connector
+     *
      * @throws \Exception
      */
     public function __construct(Connector $connector)
@@ -86,7 +82,7 @@ class BaseAmqp
     }
 
     /**
-     * Close connection after finishing
+     * Close connection after finishing.
      */
     public function __destruct()
     {
@@ -95,6 +91,7 @@ class BaseAmqp
 
     /**
      * @param Connector $connector
+     *
      * @throws \Exception
      */
     private function connect(Connector $connector)
@@ -104,7 +101,8 @@ class BaseAmqp
     }
 
     /**
-     * Close connection then connect to rabbitmq server
+     * Close connection then connect to rabbitmq server.
+     *
      * @throws \Exception
      */
     public function reconnect()
@@ -115,7 +113,7 @@ class BaseAmqp
     }
 
     /**
-     * Close connection with rabbitmq server
+     * Close connection with rabbitmq server.
      */
     private function closeConnection()
     {
@@ -148,7 +146,8 @@ class BaseAmqp
     }
 
     /**
-     * Declares exchange
+     * Declares exchange.
+     *
      * @param array $options
      */
     protected function exchangeDeclare(array $options)
@@ -169,7 +168,8 @@ class BaseAmqp
     }
 
     /**
-     * Declares queue, creates if needed
+     * Declares queue, creates if needed.
+     *
      * @param array $options
      */
     protected function queueDeclare(array $options)
@@ -195,7 +195,7 @@ class BaseAmqp
     }
 
     /**
-     * Binds queue to an exchange
+     * Binds queue to an exchange.
      *
      * @param string $queue
      * @param string $exchange
@@ -218,7 +218,7 @@ class BaseAmqp
     }
 
     /**
-     * Close channel and connection
+     * Close channel and connection.
      */
     public function shutdown()
     {
