@@ -9,7 +9,8 @@
     "exchange",
     "queue",
     "message broker",
-    "amqp"
+    "amqp",
+    "almatar.com"
   ],
   "license": "MIT",
   "authors": [
@@ -26,8 +27,5 @@
     "psr-4": {
       "Almatar\\RabbitMQ\\": "src"
     }
-  },
-  "require-dev": {
-    "squizlabs/php_codesniffer": "3.*"
   }
 }
