@@ -1,6 +1,6 @@
 {
   "name": "almatar/rabbitmq",
-  "type": "package",
+  "type": "library",
   "description": "Integrates php-amqplib with Laravel & RabbitMQ.",
   "keywords": [
     "laravel",
