@@ -20,7 +20,6 @@
   ],
   "require": {
     "php": "^7.0",
-    "laravel/lumen-framework": "^5.0",
     "php-amqplib/php-amqplib": "^2.7"
   },
   "autoload": {
