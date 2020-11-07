@@ -1,7 +1,7 @@
 {
   "name": "almatar/rabbitmq",
   "type": "library",
-  "description": "Integrates php-amqplib with Laravel & RabbitMQ.",
+  "description": "Integrates php-amqplib with Laravel & Lumen.",
   "keywords": [
     "laravel",
     "lumen",
@@ -19,12 +19,19 @@
     }
   ],
   "require": {
-    "php": "^7.0",
+    "php": "^7.2",
     "php-amqplib/php-amqplib": "^2.7"
   },
   "autoload": {
     "psr-4": {
       "Almatar\\RabbitMQ\\": "src"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Almatar\\RabbitMQ\\RabbitMQServiceProvider"
+      ]
     }
   }
 }
