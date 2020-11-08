@@ -1,34 +1,27 @@
-# Rabbitmq
-[Rabbitmq](https://rabbitmq.com) adapter for [Lumen PHP framework](lumen.laravel.com)
-
+# almatar/rabbitmq
+A [rabbitmq](https://rabbitmq.com) adapter for [Laravel](laravel.com)/[Lumen](lumen.laravel.com) PHP framework
 
 ## Requirements
-- PHP >= 7.0
-- Lumen/Laravel >= 5.0
+- PHP >= 7.2
 - php-amqplib/php-amqplib >= 2.7
+- Laravel >= 6.0
 
-## Usage
-### Install through Composer
+## Install
+
 Run the following command to install the package:
 
 ```sh
 composer require almatar/rabbitmq
 ```
 
-### Register the Service Provider
-Add the following line to `bootstrap/app.php`:
+## Configure
 
-```php
-$app->register(Almatar\RabbitMQ\RabbitMQServiceProvider::class);
-```
-
-### Configure
+### Create the config file
 create `config/rabbitmq.php` where you can define rabbitmq connections, producers, and consumers.
 
 Example of `config/rabbitmq.php`
 
 ```php
-
 <?php
 
 return [
@@ -74,19 +67,34 @@ return [
 
 ```
 
+in case of `Lumen` load the configuration file manually `bootstrap/app.php`.
+
+```php
+$app->configure('rabbitmq');
+```
+
+### Register the Service Provider for Lumen
+Add the following line to `bootstrap/app.php`:
+
+```php
+$app->register(Almatar\RabbitMQ\RabbitMQServiceProvider::class);
+```
+
+## Use
+
 ### Example of `consumer`
 
 ```php
-
 <?php
 
 namespace App\Console\Commands;
 
-use App\Services\TestService;
-use Almatar\RabbitMQ\Adapters\Consumer;
+use Throwable;
 use Illuminate\Console\Command;
+use PhpAmqpLib\Message\AMQPMessage;
+use Almatar\RabbitMQ\Adapters\Consumer;
 
-class TestCommand extends Command
+class TestConsumer extends Command
 {
     /**
      * The name and signature of the console command.
@@ -109,19 +117,13 @@ class TestCommand extends Command
     private $consumer;
 
     /**
-     * @var TestService
-     */
-    private $service;
-
-    /**
      * TestCommand constructor.
      * @param Consumer $consumer
      * @param TestService $service
      */
-    public function __construct(Consumer $consumer, TestService $service)
+    public function __construct(Consumer $consumer)
     {
         $this->consumer = $consumer;
-        $this->service = $service;
         parent::__construct();
     }
 
@@ -134,8 +136,18 @@ class TestCommand extends Command
         
         $this->consumer->subscribe(
             config('rabbitmq.consumers.test_consumer'),
-            [$this->service, 'execute']
+            [$this, 'consume']
         );
+    }
+
+    public function consume(AMQPMessage $message)
+    {
+        try {
+            $this->info('Message Consumed'); $this->info($message->getBody());
+            $message->ack();
+        } catch (Throwable $t) {
+            die($t->getMessage());
+        }
     }
 }
 
@@ -150,7 +162,6 @@ class TestCommand extends Command
 namespace App\Services;
 
 use Almatar\RabbitMQ\Adapters\Producer;
-use PhpAmqpLib\Message\AMQPMessage;
 
 class TestService
 {
@@ -172,13 +183,19 @@ class TestService
      * @param AMQPMessage $message
      * @throws Exception
      */
-    public function execute(AMQPMessage $message)
+    public function execute()
     {
+        $testMessageBody = [
+            'name' => 'John Doe',
+            'Age' => 7000
+        ];
+
+        $messageBody = json_encode($testMessageBody);
+
         $this->producer->publish(
             config('rabbitmq.producers.test_producer'), 
-            $message->getBody()
+            $messageBody
         );
-        $message->delivery_info['channel']->basic_ack($message->delivery_info['delivery_tag'], false);
     }
 }
 
