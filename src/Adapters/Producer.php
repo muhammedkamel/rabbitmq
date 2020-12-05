@@ -1,37 +1,54 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Almatar\RabbitMQ\Adapters;
 
-use PhpAmqpLib\Message\AMQPMessage;
+use InvalidArgumentException;
 use PhpAmqpLib\Wire\AMQPTable;
+use PhpAmqpLib\Message\AMQPMessage;
 
-/**
- * Class Producer.
- *
- * @author Mohamed Kamel <muhamed.kamel.elsayed@gmail.com>
- */
 class Producer extends BaseAmqp
 {
-    /**
-     * @param array  $config
-     * @param string $msgBody
-     * @param array  $additionalProperties
-     * @param array  $headers
-     */
-    public function publish(array $config, string $msgBody, array $additionalProperties = [], array $headers = [])
+    public function publishOnQueue(string $queue, $msgBody, array $headers = [], array $additionalProperties = [])
     {
-        $this->exchangeDeclare($config['exchange_options']);
+        $queueDefinition = config("rabbitmq.queues.{$queue}");
 
-        $this->queueDeclare($config['queue_options']);
+        if (!$queueDefinition) throw new InvalidArgumentException('Invalid queue definition');
 
-        $msg = new AMQPMessage((string) $msgBody, array_merge($this->getBasicProperties(), $additionalProperties));
+        $this->declareQueue($queueDefinition);
+
+        $msg = $this->prepareMessage($msgBody, $headers, $additionalProperties);
+
+        $this->getChannel()->basic_publish($msg, '', $queueDefinition['name']);
+    }
+
+    public function publishOnExchange(string $exchange, $msgBody, array $headers = [], array $additionalProperties = [])
+    {
+        $exchangeDefinition = config("rabbitmq.exchanges.{$exchange}");
+
+        if (!$exchangeDefinition) throw new InvalidArgumentException('Invalid exchange definition');
+
+        $this->declareExchange($exchangeDefinition);
+
+        $msg = $this->prepareMessage($msgBody, $headers, $additionalProperties);
+
+        $this->getChannel()->basic_publish($msg, $exchangeDefinition['name'], $exchangeDefinition['routing_key'] ?? '');
+    }
+
+    protected function prepareMessage($msgBody, array $headers, array $additionalProperties)
+    {
+        if (!is_string($msgBody)) {
+            $msgBody = json_encode($msgBody);
+        }
+
+        $msg = new AMQPMessage($msgBody, array_merge($this->getBasicProperties(), $additionalProperties));
 
         if (!empty($headers)) {
             $headersTable = new AMQPTable($headers);
             $msg->set('application_headers', $headersTable);
         }
 
-        $this->getChannel()
-            ->basic_publish($msg, $this->exchangeOptions['name'], (string) $this->queueOptions['routing_key']);
+        return $msg;
     }
 }

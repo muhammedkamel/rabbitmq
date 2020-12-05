@@ -1,14 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Almatar\RabbitMQ;
 
 use Illuminate\Support\ServiceProvider;
+use Almatar\RabbitMQ\Connectors\Connector;
 
-/**
- * Class RabbitMQServiceProvider.
- *
- * @author Mohamed Kamel <muhamed.kamel.elsayed@gmail.com>
- */
 class RabbitMQServiceProvider extends ServiceProvider
 {
     /**
@@ -18,8 +16,11 @@ class RabbitMQServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(Connector::class, function ($app) {
-            return new Connector(config('rabbitmq.connections.default'));
+        $connectionName = config('connection', 'default');
+        $connectionConfig = config("rabbitmq.connections.{$connectionName}");
+
+        $this->app->singleton(Connector::class, function () use ($connectionConfig) {
+            return new Connector($connectionConfig);
         });
     }
 }

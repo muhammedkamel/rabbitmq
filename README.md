@@ -38,29 +38,31 @@ return [
             'heartbeat' => 15,
         ],
     ],
-    'producers' => [
-        'test_producer' => [
-            'exchange_options' => [
-                'name' => 'test_exchange',
-                'type' => 'fanout'
-            ],
-            'queue_options' => [
-                'name' => 'test_queue',
-                'routing_key' => '',
+    'exchanges' => [
+        'test_exchange' => [
+            'name' => 'test_exchange',
+            'type' => 'fanout',
+            'bindings' => [
+                [
+                    'name' => 'test_queue',
+                    'routing_key' => '',
+                ]
             ]
         ]
     ],
-    'consumers' => [
-        'test_consumer' => [
+    'queues' => [
+        'test_queue' => [
             'qos_prefetch_count' => 5,
-            'exchange_options' => [
-                'name' => 'test_exchange',
-                'type' => 'fanout'
+            'name' => 'test_queue',
+            'bindings' => [
+                [
+                    'name' => 'test_exchange',
+                    'headers' => [
+                        'x-match' => 'any',
+                        'name'  => 'string'
+                    ]
+                ]
             ],
-            'queue_options' => [
-                'name' => 'test_queue',
-                'routing_key' => '',
-            ]
         ]
     ],
 ];

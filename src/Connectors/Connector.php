@@ -1,15 +1,13 @@
 <?php
 
-namespace Almatar\RabbitMQ;
+declare(strict_types=1);
 
+namespace Almatar\RabbitMQ\Connectors;
+
+use Exception;
 use Illuminate\Support\Facades\Log;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 
-/**
- * Class Connector.
- *
- * @author elhassan.mohamed
- */
 class Connector
 {
     /**
@@ -64,51 +62,46 @@ class Connector
     }
 
     /**
-     * get AMQP connection.
+     * Get AMQP connection.
      *
-     * @throws \Exception
+     * @throws Exception
      *
      * @return AMQPStreamConnection
      */
-    public function getConnection()
+    public function connect()
     {
-        $connectionAttempts = 0;
+        try {
+            $this->connectionAttemps--;
+            $this->connection = new AMQPStreamConnection(
+                $this->parameters['host'],
+                $this->parameters['port'],
+                $this->parameters['user'],
+                $this->parameters['password'],
+                $this->parameters['vhost'],
+                false,
+                'AMQPLAIN',
+                null,
+                'en_US',
+                $this->parameters['connection_timeout'],
+                $this->parameters['read_write_timeout'],
+                $this->parameters['ssl_context'],
+                $this->parameters['keepalive'],
+                $this->parameters['heartbeat']
+            );
 
-        while (true) {
-            try {
-                $connectionAttempts++;
-                $this->connection = new AMQPStreamConnection(
-                    $this->parameters['host'],
-                    $this->parameters['port'],
-                    $this->parameters['user'],
-                    $this->parameters['password'],
-                    $this->parameters['vhost'],
-                    false,
-                    'AMQPLAIN',
-                    null,
-                    'en_US',
-                    $this->parameters['connection_timeout'],
-                    $this->parameters['read_write_timeout'],
-                    $this->parameters['ssl_context'],
-                    $this->parameters['keepalive'],
-                    $this->parameters['heartbeat']
-                );
+            return $this->connection;
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
 
-                return $this->connection;
-            } catch (\Exception $e) {
-                if ($connectionAttempts < $this->connectionAttemps) {
-                    Log::warning($e->getMessage());
+            if ($this->connectionAttemps <= 0) throw $e;
 
-                    if ($this->connection !== null) {
-                        $this->connection->close();
-                    }
-
-                    sleep($this->reconnectWaitingSecs);
-                    continue;
-                } else {
-                    throw $e;
-                }
+            if (!is_null($this->connection)) {
+                $this->connection->close();
             }
+
+            sleep($this->reconnectWaitingSecs);
+
+            return $this->connect();
         }
     }
 }

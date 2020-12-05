@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Almatar\RabbitMQ\Adapters;
 
-use Almatar\RabbitMQ\Connector;
-use Illuminate\Support\Facades\Log;
-use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
+use PhpAmqpLib\Message\AMQPMessage;
+use Illuminate\Support\Facades\Log;
+use Almatar\RabbitMQ\Connectors\Connector;
+
+use function PHPSTORM_META\argumentsSet;
 
 /**
  * Class BaseAmqp.
@@ -96,7 +100,7 @@ class BaseAmqp
      */
     private function connect(Connector $connector)
     {
-        $this->connection = $connector->getConnection();
+        $this->connection = $connector->connect();
         $this->channel = $this->connection->channel();
     }
 
@@ -145,12 +149,7 @@ class BaseAmqp
         return $this->channel;
     }
 
-    /**
-     * Declares exchange.
-     *
-     * @param array $options
-     */
-    protected function exchangeDeclare(array $options)
+    protected function declareExchange(array $options)
     {
         $this->exchangeOptions = array_merge($this->exchangeOptions, $options);
 
@@ -165,14 +164,27 @@ class BaseAmqp
             $this->exchangeOptions['arguments'],
             $this->exchangeOptions['ticket']
         );
+
+        if (isset($this->queueOptions['bindings'])) {
+            $this->bindQueues($this->queueOptions['name'], $this->queueOptions['bindings']);
+        }
     }
 
-    /**
-     * Declares queue, creates if needed.
-     *
-     * @param array $options
-     */
-    protected function queueDeclare(array $options)
+    protected function bindQueues(string $exchange, array $bindings)
+    {
+        foreach ($bindings as $binding) {
+            $arguments  = [];
+
+            if (isset($binding['headers'])) {
+                $arguments = new AMQPTable($binding['headers']);
+            }
+
+            $this->getChannel()
+                ->queue_bind($binding['name'], $exchange, $binding['routing_key'] ?? '', false, $arguments);
+        }
+    }
+
+    protected function declareQueue(array $options)
     {
         $this->queueOptions = array_merge($this->queueOptions, $options);
 
@@ -187,25 +199,22 @@ class BaseAmqp
             $this->queueOptions['ticket']
         );
 
-        $this->queueBind(
-            $this->queueOptions['name'],
-            $this->exchangeOptions['name'],
-            $this->queueOptions['routing_key']
-        );
+        if (isset($this->queueOptions['bindings'])) {
+            $this->bindExchanges($this->queueOptions['name'], $this->queueOptions['bindings']);
+        }
     }
 
-    /**
-     * Binds queue to an exchange.
-     *
-     * @param string $queue
-     * @param string $exchange
-     * @param string $routing_key
-     */
-    protected function queueBind($queue, $exchange, $routing_key)
+    protected function bindExchanges(string $queue, array $bindings)
     {
-        // queue binding is not permitted on the default exchange
-        if ('' !== $exchange) {
-            $this->getChannel()->queue_bind($queue, $exchange, $routing_key);
+        foreach ($bindings as $binding) {
+            $arguments  = [];
+
+            if (isset($binding['headers'])) {
+                $arguments = new AMQPTable($binding['headers']);
+            }
+
+            $this->getChannel()
+                ->queue_bind($queue, $binding['name'], $binding['routing_key'] ?? '', false, $arguments);
         }
     }
 
@@ -226,7 +235,7 @@ class BaseAmqp
             $this->channel->close();
             $this->connection->close();
         } catch (\Exception $e) {
-            Log::warning($e->getMessage());
+            // Log::warning($e->getMessage());
         }
     }
 }

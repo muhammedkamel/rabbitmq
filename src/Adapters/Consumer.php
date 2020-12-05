@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Almatar\RabbitMQ\Adapters;
 
 use Illuminate\Support\Facades\Log;
@@ -19,6 +21,7 @@ class Consumer extends BaseAmqp
      */
     public function subscribe(array $config, $callback)
     {
+        // https://raw.githubusercontent.com/php-amqplib/php-amqplib/master/demo/amqp_message_headers_recv.php
         try {
             $this->exchangeDeclare($config['exchange_options']);
 
