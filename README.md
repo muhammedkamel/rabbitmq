@@ -209,3 +209,11 @@ Please note the following guidelines before submitting pull requests:
 
 ## License
 See [LICENSE](LICENSE).
+
+## Roadmap
+- Support publishing to queues directly
+- Support HTTPS connection
+- Support transactions
+- Support batching
+- Add unit testing
+- Adding default logger and can be customized
