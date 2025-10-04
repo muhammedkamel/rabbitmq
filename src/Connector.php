@@ -9,6 +9,7 @@ use PhpAmqpLib\Connection\AMQPStreamConnection;
  * Class Connector.
  *
  * @author elhassan.mohamed
+ * @deprecated This package is deprecated. Use vladimir-yuldashev/laravel-queue-rabbitmq instead.
  */
 class Connector
 {

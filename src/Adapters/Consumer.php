@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
  * Class Consumer.
  *
  * @author Mohamed Kamel <muhamed.kamel.elsayed@gmail.com>
+ * @deprecated This package is deprecated. Use vladimir-yuldashev/laravel-queue-rabbitmq instead.
  */
 class Consumer extends BaseAmqp
 {
