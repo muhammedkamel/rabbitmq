@@ -1,7 +1,8 @@
 {
   "name": "almatar/rabbitmq",
   "type": "library",
-  "description": "Integrates php-amqplib with Laravel & Lumen.",
+  "description": "[DEPRECATED] Integrates php-amqplib with Laravel & Lumen. Use vladimir-yuldashev/laravel-queue-rabbitmq instead.",
+  "abandoned": "vladimir-yuldashev/laravel-queue-rabbitmq",
   "keywords": [
     "laravel",
     "lumen",

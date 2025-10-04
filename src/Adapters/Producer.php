@@ -9,6 +9,7 @@ use PhpAmqpLib\Wire\AMQPTable;
  * Class Producer.
  *
  * @author Mohamed Kamel <muhamed.kamel.elsayed@gmail.com>
+ * @deprecated This package is deprecated. Use vladimir-yuldashev/laravel-queue-rabbitmq instead.
  */
 class Producer extends BaseAmqp
 {

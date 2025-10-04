@@ -1,4 +1,8 @@
-# almatar/rabbitmq
+# almatar/rabbitmq - ⚠️ DEPRECATED
+
+> **⚠️ This package is deprecated and no longer maintained.**  
+> We recommend using [vladimir-yuldashev/laravel-queue-rabbitmq](https://github.com/vyuldashev/laravel-queue-rabbitmq) as a modern, actively maintained alternative.
+
 A [rabbitmq](https://rabbitmq.com) adapter for [Laravel](laravel.com)/[Lumen](lumen.laravel.com) PHP framework
 
 ## Requirements
@@ -208,10 +212,160 @@ Please note the following guidelines before submitting pull requests:
 ## License
 See [LICENSE](LICENSE).
 
+## Migration to vladimir-yuldashev/laravel-queue-rabbitmq
+
+### Why Migrate?
+The recommended package offers several advantages:
+- **Laravel Queue Integration**: Seamless integration with Laravel's built-in queue system
+- **Active Maintenance**: Regularly updated with bug fixes and new features
+- **Better Documentation**: Comprehensive documentation and examples
+- **Modern PHP Support**: Supports modern PHP versions and Laravel releases
+- **Queue Jobs**: Native support for Laravel job classes
+- **Better Error Handling**: Improved error handling and retry mechanisms
+- **Testing Support**: Built-in testing capabilities
+
+### Migration Steps
+
+#### 1. Install the New Package
+```bash
+composer require vladimir-yuldashev/laravel-queue-rabbitmq
+```
+
+#### 2. Update Configuration
+Replace your `config/rabbitmq.php` with the new queue configuration in `config/queue.php`:
+
+```php
+'connections' => [
+    // ... other connections
+    'rabbitmq' => [
+        'driver' => 'rabbitmq',
+        'hosts' => [
+            [
+                'host' => env('RABBITMQ_HOST', '127.0.0.1'),
+                'port' => env('RABBITMQ_PORT', 5672),
+                'user' => env('RABBITMQ_USER', 'guest'),
+                'password' => env('RABBITMQ_PASSWORD', 'guest'),
+                'vhost' => env('RABBITMQ_VHOST', '/'),
+            ],
+        ],
+        'options' => [
+            'exchange' => [
+                'name' => env('RABBITMQ_EXCHANGE_NAME', 'default'),
+                'type' => env('RABBITMQ_EXCHANGE_TYPE', 'direct'),
+                'declare' => env('RABBITMQ_EXCHANGE_DECLARE', true),
+                'passive' => env('RABBITMQ_EXCHANGE_PASSIVE', false),
+                'durable' => env('RABBITMQ_EXCHANGE_DURABLE', true),
+                'auto_delete' => env('RABBITMQ_EXCHANGE_AUTODELETE', false),
+                'internal' => env('RABBITMQ_EXCHANGE_INTERNAL', false),
+                'nowait' => env('RABBITMQ_EXCHANGE_NOWAIT', false),
+            ],
+            'queue' => [
+                'declare' => env('RABBITMQ_QUEUE_DECLARE', true),
+                'passive' => env('RABBITMQ_QUEUE_PASSIVE', false),
+                'durable' => env('RABBITMQ_QUEUE_DURABLE', true),
+                'exclusive' => env('RABBITMQ_QUEUE_EXCLUSIVE', false),
+                'auto_delete' => env('RABBITMQ_QUEUE_AUTODELETE', false),
+                'bind' => env('RABBITMQ_QUEUE_BIND', true),
+                'routing_key' => env('RABBITMQ_QUEUE_ROUTING_KEY', ''),
+            ],
+        ],
+    ],
+],
+```
+
+#### 3. Convert Your Code
+
+**Old Producer Code:**
+```php
+use Almatar\RabbitMQ\Adapters\Producer;
+
+class TestService
+{
+    public function execute()
+    {
+        $producer = app(Producer::class);
+        $producer->publish(
+            config('rabbitmq.producers.test_producer'), 
+            json_encode(['name' => 'John Doe', 'Age' => 7000])
+        );
+    }
+}
+```
+
+**New Laravel Job:**
+```php
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+
+class ProcessMessageJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    protected $data;
+
+    public function __construct(array $data)
+    {
+        $this->data = $data;
+    }
+
+    public function handle()
+    {
+        // Your message processing logic here
+        Log::info('Processing message', $this->data);
+    }
+}
+
+// Dispatch the job
+ProcessMessageJob::dispatch(['name' => 'John Doe', 'Age' => 7000]);
+```
+
+**Old Consumer Code:**
+```php
+use Almatar\RabbitMQ\Adapters\Consumer;
+
+class TestConsumer extends Command
+{
+    public function handle()
+    {
+        $consumer = app(Consumer::class);
+        $consumer->subscribe(
+            config('rabbitmq.consumers.test_consumer'),
+            [$this, 'consume']
+        );
+    }
+
+    public function consume(AMQPMessage $message)
+    {
+        $this->info('Message Consumed: ' . $message->getBody());
+        $message->ack();
+    }
+}
+```
+
+**New Laravel Queue Worker:**
+```bash
+# Simply run Laravel's queue worker
+php artisan queue:work rabbitmq
+```
+
+#### 4. Remove Old Package
+```bash
+composer remove almatar/rabbitmq
+```
+
+### Need Help?
+- [vladimir-yuldashev/laravel-queue-rabbitmq Documentation](https://github.com/vyuldashev/laravel-queue-rabbitmq)
+- [Laravel Queue Documentation](https://laravel.com/docs/queues)
+
 ## Roadmap
-- Support publishing to queues directly
-- Support HTTPS connection
-- Support transactions
-- Support batching
-- Add unit testing
-- Adding default logger and can be customized
+- ~~Support publishing to queues directly~~
+- ~~Support HTTPS connection~~
+- ~~Support transactions~~
+- ~~Support batching~~
+- ~~Add unit testing~~
+- ~~Adding default logger and can be customized~~
+
+**Note: This package is deprecated. Please migrate to vladimir-yuldashev/laravel-queue-rabbitmq.**
