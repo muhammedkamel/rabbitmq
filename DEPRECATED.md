@@ -13,7 +13,7 @@
 
 ## Migration Timeline
 
-- **Effective Date**: [Current Date]
+- **Effective Date**: December 19, 2024
 - **End of Support**: No new features or bug fixes will be provided
 - **Security Updates**: No security updates will be provided after deprecation
 - **Recommended Migration Window**: 3-6 months
