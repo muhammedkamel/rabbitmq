@@ -1,4 +1,7 @@
-# almatar/rabbitmq - ⚠️ DEPRECATED
+# almatar/rabbitmq - 📦 ARCHIVED
+
+> **📦 ARCHIVED REPOSITORY**  
+> This repository has been archived and is now read-only. No further updates, bug fixes, or support will be provided.
 
 > **⚠️ This package is deprecated and no longer maintained.**  
 > We recommend using [vladimir-yuldashev/laravel-queue-rabbitmq](https://github.com/vyuldashev/laravel-queue-rabbitmq) as a modern, actively maintained alternative.
